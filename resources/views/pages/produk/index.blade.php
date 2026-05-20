@@ -10,7 +10,7 @@
             <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Product</h1>
         </div>
         @perm('produk.create')
-        <a href="{{ route('produk.create') }}" class="inline-flex items-center rounded-full bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700">
+        <a href="{{ route('produk.create') }}" onclick="event.preventDefault(); window.openProductCreateModal()" class="btn btn-primary btn-lg btn-pill shadow-sm">
             Buat
         </a>
         @endperm
@@ -85,8 +85,7 @@
             @perm('produk.viewAny')
             <a href="{{ route('produk.cetak-barcode') }}"
                target="_blank"
-               class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white
-                      rounded-lg hover:bg-green-700 text-sm font-medium">
+               class="btn btn-success btn-md">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
@@ -127,8 +126,7 @@
             <!-- Cetak Barcode selected -->
             @perm('produk.viewAny')
             <button type="button" onclick="submitCetakBarcodeSelected()"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white
-                           rounded-lg hover:bg-green-700 text-sm font-medium">
+                    class="btn btn-success btn-md">
               Cetak Barcode
             </button>
             @endperm
@@ -136,8 +134,7 @@
             <!-- Reset Stok -->
             @perm('produk.viewAny')
             <button type="button" onclick="submitResetStok()"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white
-                           rounded-lg hover:bg-blue-700 text-sm font-medium">
+                    class="btn btn-outline btn-md">
               Reset Stok
             </button>
             @endperm
@@ -215,14 +212,14 @@
                             <td class="px-4 py-4">
                                 <div class="flex flex-wrap gap-2">
                                     @perm('produk.update')
-                                    <button type="button" onclick="resetSingleStock({{ $product->id }})" class="inline-flex items-center rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">Reset stok</button>
-                                    <a href="{{ route('produk.edit', $product->id) }}" class="inline-flex items-center rounded-full bg-emerald-600 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-700">Ubah</a>
+                                    <button type="button" onclick="resetSingleStock({{ $product->id }})" class="btn btn-secondary btn-xs btn-pill">Reset stok</button>
+                                    <a href="{{ route('produk.edit', $product->id) }}" data-product='@json($product)' onclick="event.preventDefault(); window.openProductEditModal({{ $product->id }}, this.dataset.product)" class="btn btn-success btn-xs btn-pill">Ubah</a>
                                     @endperm
                                     @perm('produk.delete')
                                     <form action="{{ route('produk.destroy', $product->id) }}" method="POST" class="inline" data-confirm-message="Apakah Anda yakin ingin menghapus produk ini?">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="inline-flex items-center rounded-full bg-red-600 px-3 py-2 text-xs font-semibold text-white hover:bg-red-700">Hapus</button>
+                                        <button type="submit" class="btn btn-danger btn-xs btn-pill">Hapus</button>
                                     </form>
                                     @endperm
                                 </div>
@@ -235,6 +232,141 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<!-- Product Create / Edit Modal -->
+<script>window.productBaseUrl = "{{ url('produk') }}";</script>
+<div id="product-modal" class="hidden fixed inset-0 z-50 items-center justify-center p-4">
+    <div class="fixed inset-0 z-40 bg-slate-900/30 backdrop-blur-sm dark:bg-black/60" data-modal-backdrop onclick="window.closeProductModal()"></div>
+    <div class="relative z-50 w-full max-w-2xl mx-auto rounded-2xl border border-gray-200 bg-white shadow-xl dark:border-gray-800 dark:bg-slate-900 overflow-auto">
+        <div class="flex items-center justify-between p-4 border-b dark:border-gray-700">
+            <h3 id="product-modal-title" class="text-lg font-medium text-slate-900 dark:text-white">Buat Produk</h3>
+            <button type="button" onclick="window.closeProductModal()" class="text-slate-500 hover:text-slate-700 dark:text-slate-300">×</button>
+        </div>
+        <div class="p-4">
+            {{-- Create Form --}}
+            <form id="product-modal-form-create" action="{{ route('produk.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                @csrf
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Nama Produk</label>
+                        <input name="name" type="text" class="mt-1 block w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Kategori Produk</label>
+                        <select name="category_id" class="mt-1 block w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                            <option value="">-- Pilih Kategori --</option>
+                            @foreach(\App\Models\Category::all() as $cat)
+                                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Harga Modal</label>
+                        <input name="cost_price" type="number" step="0.01" class="mt-1 block w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Harga Jual</label>
+                        <input name="price" type="number" step="0.01" class="mt-1 block w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Gambar Produk</label>
+                        <input name="image" type="file" accept="image/*" class="mt-1 block w-full text-sm text-slate-700 dark:text-slate-300">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Stok Produk</label>
+                        <input name="stock" type="number" class="mt-1 block w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value="0" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">SKU</label>
+                        <input name="sku" type="text" class="mt-1 block w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Kode Barcode</label>
+                        <input name="barcode" type="text" class="mt-1 block w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="inline-flex items-center gap-2">
+                            <input name="is_active" type="checkbox" class="rounded text-emerald-600">
+                            <span class="text-sm text-slate-700 dark:text-slate-300">Produk Aktif</span>
+                        </label>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Deskripsi Produk</label>
+                        <textarea name="description" class="mt-1 block w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 justify-end pt-4">
+                    <button type="button" onclick="window.closeProductModal()" class="btn btn-secondary btn-md">Batal</button>
+                    <button type="submit" class="btn btn-primary btn-md">Create</button>
+                    <button type="submit" name="create_another" value="1" class="btn btn-secondary btn-md">Create & create another</button>
+                </div>
+            </form>
+
+            {{-- Edit Form --}}
+            <form id="product-modal-form-edit" action="" method="POST" enctype="multipart/form-data" class="space-y-4 hidden">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="_edit_id" value="">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Nama Produk</label>
+                        <input name="name" type="text" class="mt-1 block w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Kategori Produk</label>
+                        <select name="category_id" class="mt-1 block w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                            <option value="">-- Pilih Kategori --</option>
+                            @foreach(\App\Models\Category::all() as $cat)
+                                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Harga Modal</label>
+                        <input name="cost_price" type="number" step="0.01" class="mt-1 block w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Harga Jual</label>
+                        <input name="price" type="number" step="0.01" class="mt-1 block w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Gambar Produk</label>
+                        <input name="image" type="file" accept="image/*" class="mt-1 block w-full text-sm text-slate-700 dark:text-slate-300">
+                        <div class="mt-2" id="edit-image-preview-wrapper"></div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Stok Produk</label>
+                        <input name="stock" type="number" class="mt-1 block w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">SKU</label>
+                        <input name="sku" type="text" class="mt-1 block w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Kode Barcode</label>
+                        <input name="barcode" type="text" class="mt-1 block w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="inline-flex items-center gap-2">
+                            <input name="is_active" type="checkbox" class="rounded text-emerald-600">
+                            <span class="text-sm text-slate-700 dark:text-slate-300">Produk Aktif</span>
+                        </label>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Deskripsi Produk</label>
+                        <textarea name="description" class="mt-1 block w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 justify-end pt-4">
+                    <button type="button" onclick="window.closeProductModal()" class="btn btn-secondary btn-md">Batal</button>
+                    <button type="submit" class="btn btn-primary btn-md">Save changes</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

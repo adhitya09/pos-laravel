@@ -29,8 +29,10 @@ class RoleController extends Controller
         ]);
 
         $data = $request->only(['name', 'description']);
-        // Ensure permissions is always an array (empty when none selected)
-        $data['permissions'] = $request->get('permissions', []);
+        $data['permissions'] = collect($request->get('permissions', []))
+            ->filter(fn ($permission) => in_array($permission, $this->allowedPermissions(), true))
+            ->values()
+            ->all();
 
         Role::create($data);
 
@@ -52,8 +54,10 @@ class RoleController extends Controller
         ]);
 
         $data = $request->only(['name', 'description']);
-        // If permissions not present in request, treat as empty array (unchecked)
-        $data['permissions'] = $request->get('permissions', []);
+        $data['permissions'] = collect($request->get('permissions', []))
+            ->filter(fn ($permission) => in_array($permission, $this->allowedPermissions(), true))
+            ->values()
+            ->all();
 
         $role->update($data);
 
@@ -74,45 +78,111 @@ class RoleController extends Controller
      */
     protected function permissionGroups(): array
     {
-        // Define normalized permission keys and labels.
-        $standardActions = [
-            'viewAny' => 'Lihat / Daftar',
-            'view' => 'Detail',
-            'create' => 'Buat',
-            'update' => 'Ubah',
-            'delete' => 'Hapus',
-            'restore' => 'Restore',
-            'forceDelete' => 'Force Delete',
-            'export' => 'Export',
+        return [
+            [
+                'resource' => 'dashboard',
+                'label' => 'Dashboard',
+                'actions' => [
+                    'viewAny' => 'Lihat',
+                ],
+            ],
+            [
+                'resource' => 'pos',
+                'label' => 'POS',
+                'actions' => [
+                    'viewAny' => 'Lihat',
+                ],
+            ],
+            [
+                'resource' => 'kategori',
+                'label' => 'Kategori',
+                'actions' => [
+                    'viewAny' => 'Lihat',
+                ],
+            ],
+            [
+                'resource' => 'produk',
+                'label' => 'Produk',
+                'actions' => [
+                    'viewAny' => 'Lihat',
+                ],
+            ],
+            [
+                'resource' => 'inventory',
+                'label' => 'Inventory',
+                'actions' => [
+                    'viewAny' => 'Lihat',
+                ],
+            ],
+            [
+                'resource' => 'payment-method',
+                'label' => 'Metode Pembayaran',
+                'actions' => [
+                    'viewAny' => 'Lihat',
+                    'restore' => 'Restore',
+                ],
+            ],
+            [
+                'resource' => 'transaksi',
+                'label' => 'Transaksi',
+                'actions' => [
+                    'viewAny' => 'Lihat',
+                    'update' => 'Ubah',
+                ],
+            ],
+            [
+                'resource' => 'cash-flow',
+                'label' => 'Cash Flow',
+                'actions' => [
+                    'viewAny' => 'Lihat',
+                ],
+            ],
+            [
+                'resource' => 'report',
+                'label' => 'Laporan',
+                'actions' => [
+                    'viewAny' => 'Lihat',
+                ],
+            ],
+            [
+                'resource' => 'user',
+                'label' => 'User',
+                'actions' => [
+                    'viewAny' => 'Lihat',
+                    'update' => 'Ubah',
+                ],
+            ],
+            [
+                'resource' => 'role',
+                'label' => 'Role',
+                'actions' => [
+                    'viewAny' => 'Lihat',
+                    'create' => 'Buat',
+                    'update' => 'Ubah',
+                    'delete' => 'Hapus',
+                ],
+            ],
+            [
+                'resource' => 'setting',
+                'label' => 'Setting',
+                'actions' => [
+                    'viewAny' => 'Lihat',
+                    'update' => 'Ubah',
+                ],
+            ],
         ];
+    }
 
-        // Resources and optional custom action sets (dashboard uses only view)
-        $resources = [
-            // Dashboard listing should use the standardized `viewAny` action
-            ['resource' => 'dashboard', 'label' => 'Dashboard', 'actions' => ['viewAny' => 'Lihat']],
-            ['resource' => 'pos', 'label' => 'POS'],
-            ['resource' => 'kategori', 'label' => 'Kategori'],
-            ['resource' => 'produk', 'label' => 'Produk'],
-            ['resource' => 'inventory', 'label' => 'Inventory'],
-            ['resource' => 'payment-method', 'label' => 'Metode Pembayaran'],
-            ['resource' => 'transaksi', 'label' => 'Transaksi'],
-            ['resource' => 'cash-flow', 'label' => 'Cash Flow'],
-            ['resource' => 'report', 'label' => 'Laporan'],
-            ['resource' => 'user', 'label' => 'User'],
-            ['resource' => 'role', 'label' => 'Role'],
-            ['resource' => 'setting', 'label' => 'Setting'],
-            ['resource' => 'profile', 'label' => 'Profile'],
-        ];
-
-        $groups = [];
-        foreach ($resources as $res) {
-            $groups[] = [
-                'resource' => $res['resource'],
-                'label' => $res['label'],
-                'actions' => $res['actions'] ?? $standardActions,
-            ];
-        }
-
-        return $groups;
+    protected function allowedPermissions(): array
+    {
+        return collect($this->permissionGroups())
+            ->flatMap(function ($group) {
+                return collect($group['actions'])
+                    ->keys()
+                    ->map(fn ($actionKey) => $group['resource'] . '.' . $actionKey);
+            })
+            ->push('*')
+            ->values()
+            ->all();
     }
 }

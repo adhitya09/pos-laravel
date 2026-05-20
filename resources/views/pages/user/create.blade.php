@@ -9,7 +9,7 @@
             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Buat akun pengguna baru</p>
         </div>
         <a href="{{ route('user.index') }}"
-           class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm font-medium">
+           class="btn btn-secondary btn-sm">
             ← Kembali
         </a>
     </div>
@@ -70,11 +70,11 @@
             {{-- Tombol --}}
             <div class="flex items-center gap-3 mt-6">
                 <button type="submit"
-                        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
+                        class="btn btn-primary btn-md">
                     Simpan User
                 </button>
                 <a href="{{ route('user.index') }}"
-                   class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
+                   class="btn btn-secondary btn-md">
                     Batal
                 </a>
             </div>

@@ -9,7 +9,7 @@
             <p class="text-sm text-slate-500 dark:text-slate-400">Inventory</p>
             <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Buat inventory</h1>
         </div>
-        <a href="{{ route('inventory.index') }}" class="inline-flex items-center justify-center rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">
+        <a href="{{ route('inventory.index') }}" class="btn btn-secondary btn-lg">
             Kembali
         </a>
     </div>
@@ -90,7 +90,7 @@
                 </table>
             </div>
 
-            <button type="button" onclick="addItem()" class="mt-4 inline-flex items-center rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">
+            <button type="button" onclick="addItem()" class="btn btn-secondary btn-md mt-4">
                 Tambahkan inventory items
             </button>
         </div>
@@ -101,10 +101,10 @@
         </div>
 
         <div class="flex flex-wrap justify-end gap-3">
-            <a href="{{ route('inventory.index') }}" class="inline-flex items-center justify-center rounded-2xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-gray-700 dark:text-slate-200 dark:hover:bg-slate-800">
+            <a href="{{ route('inventory.index') }}" class="btn btn-secondary btn-md">
                 Batal
             </a>
-            <button type="submit" class="inline-flex items-center justify-center rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700">
+            <button type="submit" class="btn btn-primary btn-md">
                 Buat
             </button>
         </div>

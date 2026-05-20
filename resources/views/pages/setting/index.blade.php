@@ -139,19 +139,17 @@
 </div>
 
 {{-- MODAL UBAH SETTING --}}
-<div id="settingModal" class="fixed inset-0 z-50 hidden">
-  <div class="absolute inset-0 bg-black bg-opacity-50"
-       onclick="closeSettingModal()"></div>
+<div id="setting-modal" class="fixed inset-0 z-50 hidden items-center justify-center px-4 py-6">
+  <div class="fixed inset-0 z-40 bg-slate-900/30 backdrop-blur-sm dark:bg-black/60"
+       onclick="closeSettingModal()"
+       aria-hidden="true"></div>
 
-  <div class="relative z-10 flex items-center justify-center min-h-screen p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg
-                max-h-screen overflow-y-auto">
+  <div class="relative z-50 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border border-gray-200 bg-white shadow-xl dark:border-gray-800 dark:bg-gray-900">
 
-      <div class="flex items-center justify-between px-6 py-4 border-b
-                  border-gray-200 dark:border-gray-700">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
         <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Ubah setting</h2>
-        <button onclick="closeSettingModal()"
-                class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+        <button type="button" onclick="closeSettingModal()"
+                class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M6 18L18 6M6 6l12 12"/>
@@ -174,9 +172,7 @@
             <input type="text" name="store_name"
                    value="{{ old('store_name', $setting->store_name ?? '') }}"
                    required
-                   class="w-full px-3 py-2 border border-gray-300 rounded-lg
-                          focus:outline-none focus:ring-2 focus:ring-teal-500
-                          dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                   class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500">
           </div>
 
           <div class="mb-4">
@@ -186,9 +182,7 @@
             <input type="text" name="store_address"
                    value="{{ old('store_address', $setting->store_address ?? '') }}"
                    required
-                   class="w-full px-3 py-2 border border-gray-300 rounded-lg
-                          focus:outline-none focus:ring-2 focus:ring-teal-500
-                          dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                   class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500">
           </div>
 
           <div class="mb-4">
@@ -198,9 +192,7 @@
             <input type="text" name="store_phone"
                    value="{{ old('store_phone', $setting->store_phone ?? '') }}"
                    required placeholder="+62 ..."
-                   class="w-full px-3 py-2 border border-gray-300 rounded-lg
-                          focus:outline-none focus:ring-2 focus:ring-teal-500
-                          dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                   class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500">
           </div>
         </div>
 
@@ -212,15 +204,15 @@
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Tipe Print <span class="text-red-500">*</span>
             </label>
-            <div class="flex gap-2" id="printTypeToggle">
+              <div class="flex flex-wrap gap-2" id="printTypeToggle">
               <button type="button" onclick="setPrintType('kabel')"
                       id="btnKabel"
-                      class="px-4 py-2 rounded-lg text-sm font-medium border transition-colors">
+                      class="px-4 py-2 rounded-lg text-sm font-medium border transition-colors bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600">
                 Kabel (Server Local)
               </button>
               <button type="button" onclick="setPrintType('bluetooth')"
                       id="btnBluetooth"
-                      class="px-4 py-2 rounded-lg text-sm font-medium border transition-colors">
+                      class="px-4 py-2 rounded-lg text-sm font-medium border transition-colors bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600">
                 Bluetooth
               </button>
             </div>
@@ -238,9 +230,7 @@
             <input type="text" name="printer_name"
                    value="{{ old('printer_name', $setting->printer_name ?? '') }}"
                    placeholder="Contoh: Epson T20"
-                   class="w-full px-3 py-2 border border-gray-300 rounded-lg
-                          focus:outline-none focus:ring-2 focus:ring-teal-500
-                          dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                   class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500">
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Samakan dengan nama printer yang anda gunakan dan sudah terdaftar
               atau terhubung di server yang sama.
@@ -265,15 +255,11 @@
               </div>
             @endif
             <div id="logoUploadArea"
-                 class="{{ (isset($setting) && $setting->store_logo) ? 'hidden' : '' }}">
+                 class="{{ (isset($setting) && $setting->store_logo) ? 'hidden' : '' }} rounded-xl border border-gray-300 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
               <input type="file" name="store_logo" id="storeLogoInput"
                      accept="image/*"
                      onchange="handleLogoChange(this)"
-                     class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm
-                            text-gray-500 file:mr-3 file:py-1 file:px-3 file:border-0
-                            file:text-sm file:font-medium file:bg-teal-50 file:text-teal-700
-                            hover:file:bg-teal-100 dark:bg-gray-700 dark:border-gray-600
-                            dark:text-gray-400">
+                     class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-teal-500 focus:ring-teal-500 file:mr-3 file:py-1 file:px-3 file:border-0 file:text-sm file:font-medium file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500">
             </div>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Pastikan format gambar adalah PNG
@@ -281,16 +267,13 @@
           </div>
         </div>
 
-        <div class="flex items-center gap-3 pt-2">
+        <div class="mt-6 flex flex-wrap items-center gap-3">
           <button type="submit"
-                  class="px-6 py-2 bg-teal-600 text-white rounded-lg
-                         hover:bg-teal-700 font-medium text-sm">
+                  class="btn btn-primary btn-md">
             Simpan
           </button>
           <button type="button" onclick="closeSettingModal()"
-                  class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg
-                         hover:bg-gray-200 font-medium text-sm
-                         dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
+                  class="btn btn-secondary btn-md">
             Batal
           </button>
         </div>
@@ -300,38 +283,52 @@
 </div>
 
 <script>
-function openSettingModal() {
-  document.getElementById('settingModal').classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
+window.openSettingModal = function () {
+  const modal = document.getElementById('setting-modal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  document.body.classList.add('overflow-hidden');
   initPrintTypeToggle();
-}
+};
 
-function closeSettingModal() {
-  document.getElementById('settingModal').classList.add('hidden');
-  document.body.style.overflow = '';
-}
+window.closeSettingModal = function () {
+  const modal = document.getElementById('setting-modal');
+  if (!modal) return;
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  document.body.classList.remove('overflow-hidden');
+};
 
-function setPrintType(type) {
-  document.getElementById('printTypeValue').value = type;
+window.setPrintType = function (type) {
+  const printTypeValue = document.getElementById('printTypeValue');
   const btnKabel = document.getElementById('btnKabel');
   const btnBluetooth = document.getElementById('btnBluetooth');
   const printerSection = document.getElementById('printerNameSection');
 
-  if (type === 'kabel') {
-    btnKabel.className = 'px-4 py-2 rounded-lg text-sm font-medium border transition-colors bg-teal-600 text-white border-teal-600';
-    btnBluetooth.className = 'px-4 py-2 rounded-lg text-sm font-medium border transition-colors bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600';
-    printerSection.classList.remove('hidden');
-  } else {
-    btnBluetooth.className = 'px-4 py-2 rounded-lg text-sm font-medium border transition-colors bg-teal-600 text-white border-teal-600';
-    btnKabel.className = 'px-4 py-2 rounded-lg text-sm font-medium border transition-colors bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600';
-    printerSection.classList.add('hidden');
+  if (printTypeValue) {
+    printTypeValue.value = type;
   }
-}
 
-function initPrintTypeToggle() {
-  const currentType = document.getElementById('printTypeValue').value;
-  setPrintType(currentType || 'kabel');
-}
+  const activeClass = 'px-4 py-2 rounded-lg text-sm font-medium border transition-colors bg-teal-600 text-white border-teal-600';
+  const inactiveClass = 'px-4 py-2 rounded-lg text-sm font-medium border transition-colors bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600';
+
+  if (btnKabel) {
+    btnKabel.className = type === 'kabel' ? activeClass : inactiveClass;
+  }
+  if (btnBluetooth) {
+    btnBluetooth.className = type === 'bluetooth' ? activeClass : inactiveClass;
+  }
+
+  if (printerSection) {
+    printerSection.classList.toggle('hidden', type !== 'kabel');
+  }
+};
+
+window.initPrintTypeToggle = function () {
+  const currentType = document.getElementById('printTypeValue')?.value || 'kabel';
+  window.setPrintType(currentType);
+};
 
 function handleLogoChange(input) {
   if (input.files && input.files[0]) {
@@ -341,7 +338,10 @@ function handleLogoChange(input) {
 }
 
 function clearLogo() {
-  document.getElementById('storeLogoInput').value = '';
+  const input = document.getElementById('storeLogoInput');
+  const uploadArea = document.getElementById('logoUploadArea');
+  if (input) input.value = '';
+  if (uploadArea) uploadArea.classList.remove('hidden');
 }
 </script>
 @endsection

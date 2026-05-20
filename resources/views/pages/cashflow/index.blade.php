@@ -12,7 +12,7 @@
         <div>
             <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Cash Flow</h1>
         </div>
-        <button onclick="openCreateModal()" class="inline-flex items-center justify-center rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700">
+        <button onclick="openCreateModal()" class="btn btn-primary btn-lg">
             Buat
         </button>
     </div>
@@ -68,7 +68,7 @@
                 Menampilkan 1 sampai {{ $cashFlows->count() }} dari {{ $cashFlows->total() }} hasil
             </div>
             <div class="flex items-center gap-2">
-                <button onclick="openFilterModal()" class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800">
+                <button onclick="openFilterModal()" class="btn btn-icon">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
                     </svg>
@@ -85,7 +85,6 @@
                         <th class="px-6 py-4">Type</th>
                         <th class="px-6 py-4">Source</th>
                         <th class="px-6 py-4">Amount</th>
-                        <th class="px-6 py-4">Action</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200 bg-white dark:divide-slate-700 dark:bg-slate-900">
@@ -103,17 +102,10 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900 dark:text-white">
                             {{ $flow->formatted_amount }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <form method="POST" action="{{ route('cash-flow.destroy', $flow->id) }}" class="inline" data-confirm-message="Yakin ingin menghapus?">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">Hapus</button>
-                            </form>
-                        </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-12 text-center text-sm text-slate-500 dark:text-slate-400">
+                        <td colspan="4" class="px-6 py-12 text-center text-sm text-slate-500 dark:text-slate-400">
                             Belum ada data cash flow
                         </td>
                     </tr>
@@ -129,11 +121,11 @@
 </div>
 
 <!-- Modal Create Cash Flow -->
-<div id="createModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 p-4">
-    <div class="w-full max-w-md rounded-3xl bg-white shadow-xl dark:bg-slate-900">
+<div id="createModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/30 backdrop-blur-sm dark:bg-black/60 p-4">
+    <div class="w-full max-w-md rounded-3xl bg-white shadow-xl dark:bg-slate-900 transition-all duration-200 ease-out transform opacity-0 scale-95" data-modal-panel>
         <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4 dark:border-slate-700">
-            <h2 class="text-lg font-bold text-slate-900 dark:text-white">Buat cash flow</h2>
-            <button onclick="closeCreateModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+            <h2 class="text-lg font-bold text-slate-900 dark:text-white">Buat Cash Flow</h2>
+            <button onclick="closeCreateModal()" type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                 </svg>
@@ -194,10 +186,10 @@
 
             <!-- Buttons -->
             <div class="flex gap-2 pt-4">
-                <button type="submit" class="flex-1 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700">
+                <button type="submit" class="btn btn-primary btn-md flex-1">
                     Buat
                 </button>
-                <button type="button" onclick="closeCreateModal()" class="flex-1 rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800">
+                <button type="button" onclick="closeCreateModal()" class="btn btn-secondary btn-md flex-1">
                     Batal
                 </button>
             </div>
@@ -206,11 +198,11 @@
 </div>
 
 <!-- Modal Filter -->
-<div id="filterModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 p-4">
-    <div class="w-full max-w-sm rounded-3xl bg-white shadow-xl dark:bg-slate-900">
+<div id="filterModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/30 backdrop-blur-sm dark:bg-black/60 p-4">
+    <div class="w-full max-w-sm rounded-3xl bg-white shadow-xl dark:bg-slate-900 transition-all duration-200 ease-out transform opacity-0 scale-95" data-modal-panel>
         <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4 dark:border-slate-700">
             <h2 class="text-lg font-bold text-slate-900 dark:text-white">Filter</h2>
-            <button onclick="closeFilterModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+            <button onclick="closeFilterModal()" type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                 </svg>
@@ -253,10 +245,10 @@
 
             <!-- Buttons -->
             <div class="flex gap-2 pt-4">
-                <a href="{{ route('cash-flow.index') }}" class="flex-1 rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-slate-800 text-center">
+                <a href="{{ route('cash-flow.index') }}" class="btn btn-danger btn-md flex-1 text-center">
                     Atur ulang filter
                 </a>
-                <button type="submit" class="flex-1 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700">
+                <button type="submit" class="btn btn-success btn-md flex-1">
                     Tutup
                 </button>
             </div>
@@ -313,10 +305,32 @@ function updateSourceOptions(type) {
     });
 }
 
+function showModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+    const panel = modal.querySelector('[data-modal-panel]');
+    modal.classList.remove('hidden');
+    requestAnimationFrame(() => {
+        if (panel) panel.classList.remove('opacity-0', 'scale-95');
+    });
+}
+
+function hideModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+    const panel = modal.querySelector('[data-modal-panel]');
+    if (panel) {
+        panel.classList.add('opacity-0', 'scale-95');
+        setTimeout(() => modal.classList.add('hidden'), 180);
+    } else {
+        modal.classList.add('hidden');
+    }
+}
+
 function openCreateModal() {
     const modal = document.getElementById('createModal');
     if (modal) {
-        modal.classList.remove('hidden');
+        showModal('createModal');
         // Set default date to today
         const dateInput = document.getElementById('date');
         if (dateInput) {
@@ -326,11 +340,10 @@ function openCreateModal() {
 }
 
 function closeCreateModal() {
-    const modal = document.getElementById('createModal');
     const form = document.getElementById('createForm');
     const errorMsg = document.getElementById('errorMessage');
 
-    if (modal) modal.classList.add('hidden');
+    hideModal('createModal');
     if (form) form.reset();
     if (errorMsg) errorMsg.classList.add('hidden');
 
@@ -338,13 +351,11 @@ function closeCreateModal() {
 }
 
 function openFilterModal() {
-    const modal = document.getElementById('filterModal');
-    if (modal) modal.classList.remove('hidden');
+    showModal('filterModal');
 }
 
 function closeFilterModal() {
-    const modal = document.getElementById('filterModal');
-    if (modal) modal.classList.add('hidden');
+    hideModal('filterModal');
 }
 
 // Form submission

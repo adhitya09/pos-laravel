@@ -8,7 +8,7 @@
             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Buat metode pembayaran baru ke dalam sistem</p>
         </div>
         <a href="{{ route('payment-method.index') }}"
-           class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm font-medium">
+           class="btn btn-secondary btn-sm">
             ← Kembali
         </a>
     </div>
@@ -96,11 +96,11 @@
 
                 <div class="flex items-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <button type="submit"
-                            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
+                            class="btn btn-primary btn-md">
                         Simpan Metode Pembayaran
                     </button>
                     <a href="{{ route('payment-method.index') }}"
-                       class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
+                       class="btn btn-secondary btn-md">
                         Batal
                     </a>
                 </div>

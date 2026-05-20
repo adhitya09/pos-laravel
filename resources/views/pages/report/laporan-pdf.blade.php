@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Laporan Keuangan {{ $bulan }} {{ $tahun }}</title>
+  <title>Laporan Keuangan {{ $month ?? 1 }} {{ $year ?? now()->year }}</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; font-size: 10px; color: #111; }
@@ -47,10 +47,7 @@
   <div class="header">
     <h1>LAPORAN KEUANGAN</h1>
     <p>{{ $setting->store_name ?? 'POS System' }}</p>
-    <p>Periode: {{ \Carbon\Carbon::create($tahun, $bulan)->translatedFormat('F Y') }}</p>
-    <p>Dicetak: {{ now()->format('d/m/Y H:i') }}</p>
-  </div>
-
+    <p>Periode: {{ $periode ?? \Carbon\Carbon::create($year ?? now()->year, $month ?? now()->month)->translatedFormat('F Y') }}</p>
   {{-- Ringkasan --}}
   <div class="section-title">RINGKASAN</div>
   <table>

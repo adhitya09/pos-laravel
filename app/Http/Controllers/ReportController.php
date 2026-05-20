@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Transaction;
 use App\Models\TransactionItem;
-use App\Models\Product;
-use App\Models\CashFlow;
 use App\Models\CashboxFlow;
 use App\Models\Setting;
+use App\Models\Report;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
+use Illuminate\Validation\Rule;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\LaporanKeuanganExport;
@@ -41,37 +41,12 @@ class ReportController extends Controller
             ->whereYear('date', now()->year)
             ->sum('amount');
 
-        // Sales report - last 30 days
-        $salesReport = Transaction::select(
-                DB::raw('DATE(transaction_date) as date'),
-                DB::raw('COUNT(*) as total_transactions'),
-                DB::raw('SUM(total_amount) as total_sales')
-            )
-            ->where('transaction_date', '>=', now()->subDays(30))
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get();
-
-        // Product stock report
-        $productReport = Product::with('category')
-            ->select('name', 'stock', 'price', 'category_id')
-            ->orderBy('stock', 'asc')
-            ->get();
-
-        // Cash flow report
-        $cashFlowReport = CashboxFlow::select(
-                'type',
-                DB::raw('SUM(amount) as total_amount')
-            )
-            ->where('date', '>=', now()->subDays(30))
-            ->groupBy('type')
-            ->get();
-
-        // Recent transactions
         $recentTransactions = Transaction::with('paymentMethod')
             ->latest()
             ->limit(10)
             ->get();
+
+        $reports = Report::orderByDesc('created_at')->get();
 
         return view('pages.report.index', compact(
             'totalPenjualan',
@@ -79,54 +54,147 @@ class ReportController extends Controller
             'produkTerjual',
             'cashFlowIn',
             'cashFlowOut',
-            'salesReport',
-            'productReport',
-            'cashFlowReport',
-            'recentTransactions'
+            'recentTransactions',
+            'reports'
         ));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'type' => ['required', Rule::in([
+                Report::TYPE_INCOME,
+                Report::TYPE_EXPENSE,
+                Report::TYPE_SALES,
+            ])],
+            'from_date' => ['required', 'date'],
+            'to_date' => ['required', 'date', 'after_or_equal:from_date'],
+        ]);
+
+        Report::create([
+            'type' => $validated['type'],
+            'from_date' => $validated['from_date'],
+            'to_date' => $validated['to_date'],
+            'name' => Report::createReportName($validated['type'], $validated['from_date'], $validated['to_date']),
+            'code' => Report::generateReportCode($validated['type']),
+        ]);
+
+        $redirect = redirect()->route('report.index')->with('success', 'Laporan berhasil dibuat.');
+
+        if ($request->has('create_another')) {
+            $redirect->with('open_create_modal', true);
+        }
+
+        return $redirect;
+    }
+
+    public function update(Request $request, Report $report)
+    {
+        $validated = $request->validate([
+            'type' => ['required', Rule::in([
+                Report::TYPE_INCOME,
+                Report::TYPE_EXPENSE,
+                Report::TYPE_SALES,
+            ])],
+            'from_date' => ['required', 'date'],
+            'to_date' => ['required', 'date', 'after_or_equal:from_date'],
+        ]);
+
+        $report->update([
+            'type' => $validated['type'],
+            'from_date' => $validated['from_date'],
+            'to_date' => $validated['to_date'],
+            'name' => Report::createReportName($validated['type'], $validated['from_date'], $validated['to_date']),
+        ]);
+
+        return redirect()->route('report.index')->with('success', 'Laporan berhasil disimpan.');
     }
 
     public function exportPdf(Request $request)
     {
-        $month = $request->get('month', now()->month);
-        $year  = $request->get('year',  now()->year);
+        $from = $request->get('from') ?? $request->get('from_date');
+        $to = $request->get('to') ?? $request->get('to_date');
+        $periode = null;
+        $month = null;
+        $year = null;
 
-        $totalPenjualan   = Transaction::whereMonth('created_at', $month)
-                              ->whereYear('created_at', $year)->sum('total_amount');
-        $totalTransaksi   = Transaction::whereMonth('created_at', $month)
-                              ->whereYear('created_at', $year)->count();
-        $produkTerjual    = TransactionItem::whereMonth('created_at', $month)
-                              ->whereYear('created_at', $year)->sum('quantity');
-        $cashFlowIn       = CashboxFlow::where('type','in')
-                              ->whereMonth('date', $month)->whereYear('date', $year)
-                              ->sum('amount');
-        $cashFlowOut      = CashboxFlow::where('type','out')
-                              ->whereMonth('date', $month)->whereYear('date', $year)
-                              ->sum('amount');
-        $recentTransactions = Transaction::with('paymentMethod')
-                              ->whereMonth('created_at', $month)
-                              ->whereYear('created_at', $year)
-                              ->latest()->get();
-        $cashFlows        = CashboxFlow::with('source')
-                              ->whereMonth('date', $month)->whereYear('date', $year)
-                              ->latest()->get();
-        $setting          = Setting::first();
-        $bulan            = $month;
-        $tahun            = $year;
+        if ($from && $to) {
+            $fromDate = Carbon::parse($from)->startOfDay();
+            $toDate = Carbon::parse($to)->endOfDay();
+            $periode = sprintf('%s - %s', $fromDate->translatedFormat('d F Y'), $toDate->translatedFormat('d F Y'));
+            $month = $fromDate->month;
+            $year = $fromDate->year;
+
+            $transactionQuery = Transaction::whereBetween('transaction_date', [$fromDate, $toDate]);
+            $cashboxQuery = CashboxFlow::whereBetween('date', [$fromDate, $toDate]);
+        } else {
+            $month = $request->get('month', now()->month);
+            $year  = $request->get('year', now()->year);
+            $fromDate = Carbon::create($year, $month, 1)->startOfDay();
+            $toDate = $fromDate->copy()->endOfMonth()->endOfDay();
+            $periode = Carbon::create($year, $month)->translatedFormat('F Y');
+
+            $transactionQuery = Transaction::whereMonth('transaction_date', $month)
+                ->whereYear('transaction_date', $year);
+            $cashboxQuery = CashboxFlow::whereMonth('date', $month)
+                ->whereYear('date', $year);
+        }
+
+        $totalPenjualan = (clone $transactionQuery)->sum('total_amount');
+        $totalTransaksi = (clone $transactionQuery)->count();
+
+        // Sum quantity from transaction_items using relationship to transactions
+        $produkTerjual = TransactionItem::whereHas('transaction', function ($q) use ($fromDate, $toDate) {
+            $q->whereBetween('transaction_date', [$fromDate, $toDate]);
+        })->sum('quantity');
+
+        $cashFlowIn = (clone $cashboxQuery)
+            ->where('type', 'in')
+            ->sum('amount');
+
+        $cashFlowOut = (clone $cashboxQuery)
+            ->where('type', 'out')
+            ->sum('amount');
+
+        $recentTransactions = (clone $transactionQuery)
+            ->with('paymentMethod')
+            ->latest()
+            ->get();
+
+        $cashFlows = (clone $cashboxQuery)
+            ->with('source')
+            ->latest()
+            ->get();
+
+        $setting = Setting::first();
 
         $pdf = Pdf::loadView('pages.report.laporan-pdf', compact(
-            'totalPenjualan','totalTransaksi','produkTerjual',
-            'cashFlowIn','cashFlowOut','recentTransactions',
-            'cashFlows','setting','bulan','tahun'
+            'totalPenjualan',
+            'totalTransaksi',
+            'produkTerjual',
+            'cashFlowIn',
+            'cashFlowOut',
+            'recentTransactions',
+            'cashFlows',
+            'setting',
+            'periode',
+            'month',
+            'year'
         ))->setPaper('a4', 'portrait');
 
-        return $pdf->download('laporan-keuangan-' . $year . '-' . $month . '.pdf');
+        $fileName = sprintf(
+            'laporan-keuangan-%s-%s.pdf',
+            now()->format('YmdHis'),
+            str_replace(' ', '-', strtolower($periode))
+        );
+
+        return $pdf->download($fileName);
     }
 
     public function exportExcel(Request $request)
     {
         $month    = $request->get('month', now()->month);
-        $year     = $request->get('year',  now()->year);
+        $year     = $request->get('year', now()->year);
         $filename = 'laporan-keuangan-' . $year . '-' . $month . '.xlsx';
         return Excel::download(
             new LaporanKeuanganExport($month, $year),

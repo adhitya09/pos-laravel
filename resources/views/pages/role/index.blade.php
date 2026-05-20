@@ -7,7 +7,7 @@
     <div class="flex items-center justify-between">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Manajemen Role & Permission</h1>
         @perm('role.create')
-        <a href="{{ route('role.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+        <a href="{{ route('role.create') }}" class="btn btn-primary btn-sm">
             Tambah Role
         </a>
         @endperm

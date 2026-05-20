@@ -29,8 +29,9 @@ class InventoryController extends Controller
             ->latest();
 
         $inventories = $query->paginate($perPage)->withQueryString();
+        $products = Product::all();
 
-        return view('pages.inventory.index', compact('inventories', 'search'));
+        return view('pages.inventory.index', compact('inventories', 'search', 'products'));
     }
 
     public function create()

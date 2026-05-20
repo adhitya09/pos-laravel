@@ -12,8 +12,10 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $perPage = (int) $request->get('per_page', 10);
-        $users = User::paginate($perPage)->withQueryString();
-        return view('pages.user.index', compact('users'));
+        $users = User::with('role')->paginate($perPage)->withQueryString();
+        $roles = Role::all();
+
+        return view('pages.user.index', compact('users', 'roles'));
     }
 
     public function create()
@@ -37,6 +39,12 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
             'role_id' => $request->role_id,
         ]);
+
+        if ($request->filled('create_another')) {
+            return redirect()->route('user.index')
+                ->with('success', 'User berhasil ditambahkan')
+                ->with('open_create_modal', true);
+        }
 
         return redirect()->route('user.index')->with('success', 'User berhasil ditambahkan');
     }

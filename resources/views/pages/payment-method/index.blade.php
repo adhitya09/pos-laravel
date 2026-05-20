@@ -9,7 +9,7 @@
         </div>
         @perm('payment-method.create')
         <a href="{{ route('payment-method.create') }}"
-           class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
+           class="btn btn-primary btn-sm">
             + Tambah Metode
         </a>
         @endperm

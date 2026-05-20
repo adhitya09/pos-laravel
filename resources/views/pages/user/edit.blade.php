@@ -50,7 +50,7 @@
             @endforeach
           </select>
         </div>
-        <button type="submit" class="w-full py-3 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 font-medium">
+        <button type="submit" class="btn btn-primary btn-lg w-full">
           Update User
         </button>
       </form>

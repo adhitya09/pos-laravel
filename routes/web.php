@@ -186,8 +186,15 @@ Route::middleware('auth')->group(function () {
     */
 
     Route::resource('transaksi', TransaksiController::class)
+        ->middleware('permission:transaksi.viewAny');
+
+    Route::get('transaksi/{transaksi}/pdf', [TransaksiController::class, 'downloadPdf'])
         ->middleware('permission:transaksi.viewAny')
-        ->only(['index', 'show', 'destroy']);
+        ->name('transaksi.pdf');
+
+    Route::patch('transaksi/{transaksi}/return', [TransaksiController::class, 'returnTransaction'])
+        ->middleware('permission:transaksi.update')
+        ->name('transaksi.return');
 
 
     /*
@@ -210,6 +217,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/report', [ReportController::class, 'index'])
         ->middleware('permission:report.viewAny')
         ->name('report.index');
+
+    Route::post('/report', [ReportController::class, 'store'])
+        ->middleware('permission:report.viewAny')
+        ->name('report.store');
+
+    Route::patch('/report/{report}', [ReportController::class, 'update'])
+        ->middleware('permission:report.viewAny')
+        ->name('report.update');
 
     Route::get('/report/export/pdf', [ReportController::class, 'exportPdf'])
         ->middleware('permission:report.viewAny')
@@ -240,8 +255,29 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::resource('role', RoleController::class)
-        ->middleware('permission:role.viewAny');
+    Route::get('/role', [RoleController::class, 'index'])
+        ->middleware('permission:role.viewAny')
+        ->name('role.index');
+
+    Route::get('/role/create', [RoleController::class, 'create'])
+        ->middleware('permission:role.create')
+        ->name('role.create');
+
+    Route::post('/role', [RoleController::class, 'store'])
+        ->middleware('permission:role.create')
+        ->name('role.store');
+
+    Route::get('/role/{role}/edit', [RoleController::class, 'edit'])
+        ->middleware('permission:role.update')
+        ->name('role.edit');
+
+    Route::put('/role/{role}', [RoleController::class, 'update'])
+        ->middleware('permission:role.update')
+        ->name('role.update');
+
+    Route::delete('/role/{role}', [RoleController::class, 'destroy'])
+        ->middleware('permission:role.delete')
+        ->name('role.destroy');
 
 
     /*

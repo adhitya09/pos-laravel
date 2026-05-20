@@ -129,10 +129,10 @@
                     </div>
 
                     <div class="flex flex-wrap justify-end gap-3">
-                        <a href="{{ route('produk.index') }}" class="rounded-3xl border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-gray-700 dark:text-slate-200 dark:hover:bg-slate-800">
+                        <a href="{{ route('produk.index') }}" class="btn btn-secondary btn-md">
                             Batal
                         </a>
-                        <button type="submit" class="rounded-3xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700">
+                        <button type="submit" class="btn btn-primary btn-md">
                             Update Produk
                         </button>
                     </div>

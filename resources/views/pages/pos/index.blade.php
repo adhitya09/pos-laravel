@@ -277,8 +277,8 @@
                         </div>
 
                         {{-- Summary --}}
-                        <div class="border-t border-gray-200 dark:border-gray-700 pt-3 space-y-2 mb-4">
-                            <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                        <div class="border-y border-gray-200 dark:border-gray-700 py-4 mb-4">
+                            <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
                                 <span>Subtotal</span>
                                 <span id="subtotalDisplay">Rp 0</span>
                             </div>
@@ -288,63 +288,128 @@
                             </div>
                         </div>
 
-                        {{-- Form checkout --}}
-                        <div class="space-y-3">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                                    Nama Pelanggan (opsional)
-                                </label>
-                                <input type="text"
-                                       id="customerName"
-                                       placeholder="Nama pelanggan..."
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm
-                                              focus:outline-none focus:ring-2 focus:ring-teal-500
-                                              dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                                    Metode Pembayaran <span class="text-red-500">*</span>
-                                </label>
-                                <select id="paymentMethodId"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm
-                                               focus:outline-none focus:ring-2 focus:ring-teal-500
-                                               dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                                    <option value="">-- Pilih Metode --</option>
-                                    @foreach($paymentMethods as $pm)
-                                        <option value="{{ $pm->id }}">{{ $pm->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                                    Jumlah Bayar <span class="text-red-500">*</span>
-                                </label>
-                                <input type="number"
-                                       id="paidAmount"
-                                       placeholder="0"
-                                       min="0"
-                                       oninput="updateChange()"
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm
-                                              focus:outline-none focus:ring-2 focus:ring-teal-500
-                                              dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                            </div>
-                            <div class="flex justify-between items-center p-3 bg-teal-50 dark:bg-teal-900/20
-                                        rounded-lg">
-                                <span class="text-sm font-medium text-teal-700 dark:text-teal-300">Kembalian</span>
-                                <span id="changeDisplay"
-                                      class="text-lg font-bold text-teal-700 dark:text-teal-300">Rp 0</span>
-                            </div>
+                        <div class="space-y-3 mt-auto">
                             <button type="button"
-                                    onclick="submitTransaction()"
-                                    id="btnSubmit"
+                                    onclick="openPaymentModal()"
+                                    id="btnOpenPayment"
                                     class="w-full py-3 bg-teal-600 text-white rounded-xl font-semibold
                                            text-sm hover:bg-teal-700 transition-colors disabled:opacity-50
                                            disabled:cursor-not-allowed">
-                                Proses Transaksi
+                                Bayar
                             </button>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- PAYMENT MODAL --}}
+    <div id="paymentModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/60 px-4 py-6">
+        <div class="absolute inset-0" onclick="closePaymentModal()" aria-hidden="true"></div>
+        <div class="relative w-full max-w-2xl rounded-3xl bg-white dark:bg-slate-900 shadow-2xl overflow-hidden transform transition-all duration-200" onclick="event.stopPropagation()">
+            <div class="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-4 dark:border-slate-700">
+                <div>
+                    <h2 class="text-xl font-semibold text-slate-900 dark:text-white">Pembayaran</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Selesaikan pembayaran transaksi POS.</p>
+                </div>
+                <button type="button" onclick="closePaymentModal()" class="inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-slate-200" aria-label="Tutup">
+                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 6l8 8M14 6l-8 8" />
+                    </svg>
+                </button>
+            </div>
+            <div class="px-6 py-5 space-y-4">
+                <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+                    <div class="flex justify-between text-sm text-slate-500 dark:text-slate-400">
+                        <span>Total Belanja</span>
+                        <span id="paymentModalTotal">Rp 0</span>
+                    </div>
+                    <div class="flex justify-between mt-3 text-lg font-semibold text-slate-900 dark:text-white">
+                        <span>Kembalian</span>
+                        <span id="paymentModalChange">Rp 0</span>
+                    </div>
+                </div>
+
+                <div class="grid gap-3 sm:grid-cols-2">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Nama Customer</label>
+                        <input type="text" id="customerName" placeholder="Nama pelanggan..." class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Metode Pembayaran</label>
+                        <select id="paymentMethodId" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white">
+                            <option value="">-- Pilih Metode --</option>
+                            @foreach($paymentMethods as $pm)
+                                <option value="{{ $pm->id }}">{{ $pm->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Nominal Bayar</label>
+                    <input type="number" id="paidAmount" placeholder="0" min="0" oninput="updatePaymentModalDisplay()" class="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white" />
+                </div>
+
+                <div>
+                    <div class="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Quick Amount</div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" onclick="setPaymentAmount(50000)" class="rounded-2xl border border-slate-300 bg-white py-2 text-sm text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">50.000</button>
+                        <button type="button" onclick="setPaymentAmount(100000)" class="rounded-2xl border border-slate-300 bg-white py-2 text-sm text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">100.000</button>
+                        <button type="button" onclick="setPaymentAmount(150000)" class="rounded-2xl border border-slate-300 bg-white py-2 text-sm text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">150.000</button>
+                        <button type="button" onclick="setPaymentAmount(200000)" class="rounded-2xl border border-slate-300 bg-white py-2 text-sm text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">200.000</button>
+                        <button type="button" onclick="setPaymentAmount(500000)" class="rounded-2xl border border-slate-300 bg-white py-2 text-sm text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">500.000</button>
+                        <button type="button" onclick="setPaymentAmount(1000000)" class="rounded-2xl border border-slate-300 bg-white py-2 text-sm text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">1.000.000</button>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-3 border-t border-slate-200 px-6 py-4 dark:border-slate-700">
+                <button type="button" onclick="closePaymentModal()" class="rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">Batal</button>
+                <button type="button" onclick="submitTransaction()" id="btnSubmit" class="rounded-2xl bg-teal-600 px-5 py-3 text-sm font-semibold text-white hover:bg-teal-700">Bayar</button>
+            </div>
+        </div>
+    </div>
+
+    {{-- SUCCESS MODAL --}}
+    <div id="successModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/60 px-4 py-6">
+        <div class="absolute inset-0" onclick="closePaymentSuccessModal()" aria-hidden="true"></div>
+        <div class="relative w-full max-w-lg rounded-3xl bg-white dark:bg-slate-900 shadow-2xl overflow-hidden transform transition-all duration-200" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between gap-4 border-b border-slate-200 px-6 py-4 dark:border-slate-700">
+                <div>
+                    <h2 class="text-xl font-semibold text-slate-900 dark:text-white">Pembayaran Berhasil!</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Transaksi telah disimpan.</p>
+                </div>
+                <button type="button" onclick="closePaymentSuccessModal()" class="inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-slate-200" aria-label="Tutup">
+                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 6l8 8M14 6l-8 8" />
+                    </svg>
+                </button>
+            </div>
+            <div class="px-6 py-5 space-y-4">
+                <div class="flex items-center justify-center rounded-3xl bg-emerald-100 p-4 dark:bg-emerald-900/20">
+                    <span class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-600 text-white">
+                        ✓
+                    </span>
+                </div>
+                <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+                    <div class="mb-3 text-sm text-slate-500 dark:text-slate-400">No. Transaksi</div>
+                    <div id="successInvoice" class="text-base font-semibold text-slate-900 dark:text-white"></div>
+                </div>
+                <div class="grid gap-3 sm:grid-cols-2">
+                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+                        <div class="text-sm text-slate-500 dark:text-slate-400">Total Bayar</div>
+                        <div id="successTotal" class="mt-1 text-lg font-semibold text-slate-900 dark:text-white"></div>
+                    </div>
+                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+                        <div class="text-sm text-slate-500 dark:text-slate-400">Kembalian</div>
+                        <div id="successChange" class="mt-1 text-lg font-semibold text-slate-900 dark:text-white"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-3 border-t border-slate-200 px-6 py-4 dark:border-slate-700">
+                <button type="button" onclick="closePaymentSuccessModal()" class="rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">Lewati</button>
+                <button type="button" onclick="printReceipt()" class="rounded-2xl bg-teal-600 px-5 py-3 text-sm font-semibold text-white hover:bg-teal-700">Cetak Struk</button>
             </div>
         </div>
     </div>
@@ -355,7 +420,7 @@ const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 
 // ===== CART STATE =====
 let cart = [];
-let lastTransactionId = null;
+let lastReceiptUrl = null;
 
 function formatRupiah(n) {
     return 'Rp ' + new Intl.NumberFormat('id-ID').format(n);
@@ -406,6 +471,7 @@ function resetCart() {
 
 function renderCart() {
   const container = document.getElementById('cartItems');
+  const paymentButton = document.getElementById('btnOpenPayment');
 
   if (cart.length === 0) {
     container.innerHTML = `
@@ -423,7 +489,9 @@ function renderCart() {
       </div>`;
     document.getElementById('subtotalDisplay').textContent = 'Rp 0';
     document.getElementById('totalDisplay').textContent = 'Rp 0';
-    document.getElementById('changeDisplay').textContent = 'Rp 0';
+    if (paymentButton) paymentButton.disabled = true;
+    closePaymentModal();
+    updateChange();
     return;
   }
 
@@ -470,6 +538,7 @@ function renderCart() {
   container.innerHTML = html;
   document.getElementById('subtotalDisplay').textContent = formatRupiah(total);
   document.getElementById('totalDisplay').textContent = formatRupiah(total);
+  if (paymentButton) paymentButton.disabled = false;
   updateChange();
 }
 
@@ -478,12 +547,61 @@ function updateChange() {
     const paid  = parseFloat(document.getElementById('paidAmount').value) || 0;
     const change = paid - total;
     const el = document.getElementById('changeDisplay');
-    el.textContent = change >= 0 ? formatRupiah(change) : '- ' + formatRupiah(Math.abs(change));
-    el.className = 'text-lg font-bold ' +
-        (change >= 0 ? 'text-teal-700 dark:text-teal-300' : 'text-red-600 dark:text-red-400');
+    if (el) {
+        el.textContent = change >= 0 ? formatRupiah(change) : '- ' + formatRupiah(Math.abs(change));
+        el.className = 'text-lg font-bold ' +
+            (change >= 0 ? 'text-teal-700 dark:text-teal-300' : 'text-red-600 dark:text-red-400');
+    }
+    updatePaymentModalDisplay();
 }
 
-// ===== SUBMIT TRANSAKSI =====
+function openPaymentModal() {
+    if (cart.length === 0) {
+        showScanFeedback('Keranjang masih kosong! Tambahkan produk terlebih dahulu.', 'warning');
+        return;
+    }
+    updatePaymentModalDisplay();
+    const modal = document.getElementById('paymentModal');
+    if (modal) modal.classList.remove('hidden');
+}
+
+function closePaymentModal() {
+    const modal = document.getElementById('paymentModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function setPaymentAmount(amount) {
+    const paidInput = document.getElementById('paidAmount');
+    if (!paidInput) return;
+    paidInput.value = amount;
+    updatePaymentModalDisplay();
+}
+
+function updatePaymentModalDisplay() {
+    const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+    const paid  = parseFloat(document.getElementById('paidAmount')?.value) || 0;
+    const change = paid - total;
+    const totalEl = document.getElementById('paymentModalTotal');
+    const changeEl = document.getElementById('paymentModalChange');
+    if (totalEl) totalEl.textContent = formatRupiah(total);
+    if (changeEl) changeEl.textContent = change >= 0 ? formatRupiah(change) : '- ' + formatRupiah(Math.abs(change));
+}
+
+function showPaymentSuccessModal(transaction, receiptUrl) {
+    const modal = document.getElementById('successModal');
+    if (!modal) return;
+    document.getElementById('successInvoice').textContent = transaction.invoice_no || '';
+    document.getElementById('successTotal').textContent = formatRupiah(transaction.total_amount || 0);
+    document.getElementById('successChange').textContent = formatRupiah(transaction.change_amount || 0);
+    lastReceiptUrl = receiptUrl || lastReceiptUrl;
+    modal.classList.remove('hidden');
+}
+
+function closePaymentSuccessModal() {
+    const modal = document.getElementById('successModal');
+    if (modal) modal.classList.add('hidden');
+}
+
 async function submitTransaction() {
     if (cart.length === 0) { showScanFeedback('Keranjang masih kosong!', 'warning'); return; }
     const pmId = document.getElementById('paymentMethodId').value;
@@ -494,8 +612,10 @@ async function submitTransaction() {
     if (paid < total) { showScanFeedback('Jumlah bayar kurang dari total!', 'error'); return; }
 
     const btn = document.getElementById('btnSubmit');
-    btn.disabled = true;
-    btn.textContent = 'Memproses...';
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Memproses...';
+    }
 
     try {
         const res = await fetch('{{ route("pos.store") }}', {
@@ -512,33 +632,50 @@ async function submitTransaction() {
                 customer_name: document.getElementById('customerName').value,
             }),
         });
-        const data = await res.json();
-        if (data.success) {
-            lastTransactionId = data.transaction_id;
-            document.getElementById('btnPrintResi').disabled = false;
-            showScanFeedback(
-                '✓ Transaksi berhasil! Kembalian: ' + formatRupiah(data.change),
-                'success'
-            );
-            showPopupNotification('Transaksi berhasil!.', 'success');
-            resetCart();
-        } else {
-            const message = data.message || 'Terjadi kesalahan.';
-            showScanFeedback('Gagal: ' + message, 'error');
-            showPopupNotification('Gagal menyimpan transaksi: ' + message, 'error');
+
+        const contentType = res.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            const text = await res.text();
+            console.error('Expected JSON but got:', text);
+            showPopupNotification('Response server bukan JSON. Cek controller POS.', 'error');
+            return;
         }
-    } catch(e) {
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+            const message = (data && data.message) ? data.message : `Error server (${res.status})`;
+            showScanFeedback(message, 'error');
+            showPopupNotification(message, 'error');
+            return;
+        }
+
+        document.getElementById('btnPrintResi').disabled = false;
+        closePaymentModal();
+        showPaymentSuccessModal(data.transaction, data.receipt_url);
+        resetCart();
+        showPopupNotification(data.message || 'Transaksi berhasil.', 'success');
+    } catch (e) {
         showScanFeedback('Error koneksi. Coba lagi.', 'error');
         showPopupNotification('Error koneksi. Coba lagi.', 'error');
     } finally {
-        btn.disabled = false;
-        btn.textContent = 'Proses Transaksi';
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Bayar';
+        }
     }
 }
 
 function printLastResi() {
-    if (!lastTransactionId) return;
-    window.open('{{ url("/pos/resi") }}/' + lastTransactionId, '_blank');
+    if (!lastReceiptUrl) return;
+    window.open(lastReceiptUrl, '_blank', 'width=420,height=700');
+}
+
+function printReceipt() {
+    if (!lastReceiptUrl) {
+        showPopupNotification('Tidak ada URL resi untuk dicetak.', 'error');
+        return;
+    }
+    window.open(lastReceiptUrl, '_blank', 'width=420,height=700');
 }
 
 // ===== FILTER PRODUK =====
@@ -764,6 +901,21 @@ window.addEventListener('load', () => {
   renderCart(); // show empty state on load
   const inp = document.getElementById('barcodeInput');
   if (inp) inp.focus();
+
+  Object.assign(window, {
+    addToCart,
+    renderCart,
+    changeQty,
+    removeFromCart,
+    resetCart,
+    openPaymentModal,
+    closePaymentModal,
+    updateChange,
+    submitTransaction,
+    showPaymentSuccessModal,
+    closePaymentSuccessModal,
+    printReceipt,
+  });
 });
     </script>
 </body>

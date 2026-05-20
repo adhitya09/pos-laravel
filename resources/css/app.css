@@ -176,6 +176,8 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
+  [x-cloak] { display: none !important; }
+
   *,
   ::after,
   ::before,
@@ -256,6 +258,136 @@
   @apply text-success-600 dark:text-success-500 block rounded-full px-2.5 py-0.5 text-xs font-medium uppercase;
 }
 
+@layer components {
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
+    }
+
+    .btn-xs {
+        @apply px-2.5 py-1.5 text-xs;
+    }
+
+    .btn-sm {
+        @apply px-3 py-1.5 text-xs;
+    }
+
+    .btn-md {
+        @apply px-4 py-2 text-sm;
+    }
+
+    .btn-lg {
+        @apply px-5 py-2.5 text-base;
+    }
+
+    .btn-primary {
+        @apply bg-teal-600 text-white hover:bg-teal-700 focus:ring-teal-500;
+    }
+
+    .btn-secondary {
+        @apply border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700;
+    }
+
+    .btn-danger {
+        @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+    }
+
+    .btn-success {
+        @apply bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
+    }
+
+    .btn-warning {
+        @apply bg-amber-500 text-white hover:bg-amber-600 focus:ring-amber-400;
+    }
+
+    .btn-outline {
+        @apply border border-sky-500 bg-transparent text-sky-600 hover:bg-sky-50 focus:ring-sky-500 dark:text-sky-400 dark:hover:bg-slate-800;
+    }
+
+    .btn-ghost {
+        @apply bg-transparent text-gray-700 hover:bg-gray-100 focus:ring-gray-400 dark:text-gray-300 dark:hover:bg-gray-800;
+    }
+
+    .btn-icon {
+        @apply inline-flex h-9 w-9 items-center justify-center rounded-lg transition duration-200 focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60;
+    }
+
+    .btn-icon-secondary {
+        @apply border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700;
+    }
+
+    .btn-icon-danger {
+        @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+    }
+
+    .btn-icon-ghost {
+        @apply bg-transparent text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:ring-gray-400 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200;
+    }
+
+    .btn-pill {
+        @apply rounded-full;
+    }
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg font-semibold text-sm transition duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-60 disabled:cursor-not-allowed;
+}
+
+@utility btn-xs {
+  @apply px-3 py-1.5 text-xs;
+}
+
+@utility btn-sm {
+  @apply px-3.5 py-2 text-sm;
+}
+
+@utility btn-md {
+  @apply px-4 py-2 text-sm;
+}
+
+@utility btn-lg {
+  @apply px-5 py-3 text-sm;
+}
+
+@utility btn-pill {
+  @apply rounded-full;
+}
+
+@utility btn-primary {
+  @apply bg-teal-600 text-white hover:bg-teal-700 focus:ring-teal-500;
+}
+
+@utility btn-secondary {
+  @apply border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700;
+}
+
+@utility btn-success {
+  @apply bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
+}
+
+@utility btn-danger {
+  @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+}
+
+@utility btn-warning {
+  @apply bg-amber-500 text-white hover:bg-amber-600 focus:ring-amber-400;
+}
+
+@utility btn-info {
+  @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+}
+
+@utility btn-outline {
+  @apply border border-sky-500 bg-transparent text-sky-600 hover:bg-sky-50 dark:text-sky-400 dark:hover:bg-slate-800;
+}
+
+@utility btn-icon {
+  @apply inline-flex items-center justify-center h-10 w-10 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition;
+}
+
+@utility btn-icon-sm {
+  @apply inline-flex items-center justify-center h-9 w-9 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition;
+}
+
 @utility menu-dropdown-badge-active {
   @apply bg-success-100 dark:bg-success-500/20;
 }
@@ -303,12 +435,17 @@
 }
 @layer utilities {
   /* For Remove Date Icon */
-  input[type='date']::-webkit-inner-spin-button,
+  input[type='date']:not(.date-picker-input)::-webkit-inner-spin-button,
   input[type='time']::-webkit-inner-spin-button,
-  input[type='date']::-webkit-calendar-picker-indicator,
+  input[type='date']:not(.date-picker-input)::-webkit-calendar-picker-indicator,
   input[type='time']::-webkit-calendar-picker-indicator {
     display: none;
     -webkit-appearance: none;
+  }
+
+  input[type='date'].date-picker-input::-webkit-calendar-picker-indicator {
+    display: inline-block !important;
+    -webkit-appearance: auto !important;
   }
 }
 

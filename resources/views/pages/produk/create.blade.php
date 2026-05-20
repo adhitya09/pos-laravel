@@ -109,13 +109,13 @@
             </div>
 
             <div class="flex flex-wrap items-center justify-end gap-3">
-                <a href="{{ route('produk.index') }}" class="rounded-2xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-gray-700 dark:text-slate-200 dark:hover:bg-slate-800">
+                <a href="{{ route('produk.index') }}" class="btn btn-secondary btn-md">
                     Batal
                 </a>
-                <button type="submit" class="rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700">
+                <button type="submit" class="btn btn-primary btn-md">
                     Buat
                 </button>
-                <button type="submit" name="create_another" value="1" class="rounded-2xl bg-slate-800 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-900">
+                <button type="submit" name="create_another" value="1" class="btn btn-secondary btn-md">
                     Buat & buat lainnya
                 </button>
             </div>

@@ -166,10 +166,16 @@ class PosController extends Controller
             DB::commit();
 
             return response()->json([
-                'success'        => true,
-                'transaction_id' => $transaction->id,
-                'invoice_no'     => $transaction->invoice_no,
-                'change'         => $transaction->change_amount,
+                'success' => true,
+                'message' => 'Transaksi berhasil diproses.',
+                'transaction' => [
+                    'id' => $transaction->id,
+                    'invoice_no' => $transaction->invoice_no,
+                    'total_amount' => $transaction->total_amount,
+                    'paid_amount' => $transaction->paid_amount,
+                    'change_amount' => $transaction->change_amount,
+                ],
+                'receipt_url' => route('pos.resi', $transaction->id),
             ]);
 
         } catch (\Throwable $e) {
@@ -177,7 +183,7 @@ class PosController extends Controller
             \Log::error('POS store error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine() . '\nTrace: ' . $e->getTraceAsString());
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan sistem. Silakan coba lagi.',
+                'message' => $e->getMessage(),
             ], 500);
         }
     }

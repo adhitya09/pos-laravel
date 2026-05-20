@@ -31,9 +31,19 @@ class KategoriController extends Controller
         return redirect()->route('kategori.index')->with('success', 'Kategori berhasil ditambahkan');
     }
 
-    public function edit(Category $kategori)
+    public function edit(Request $request, Category $kategori)
     {
-        return view('pages.kategori.edit', compact('kategori'));
+        $perPage = (int) $request->get('per_page', 10);
+
+        $productsQuery = $kategori->products()->orderBy('name');
+
+        if ($request->filled('search')) {
+            $productsQuery->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $products = $productsQuery->paginate($perPage)->withQueryString();
+
+        return view('pages.kategori.edit', compact('kategori', 'products'));
     }
 
     public function update(Request $request, Category $kategori)
